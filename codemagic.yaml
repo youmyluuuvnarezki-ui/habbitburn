@@ -1,5 +1,35 @@
 workflows:
-    sample-workflow:
-        name: Codemagic Sample Workflow
-        max_build_duration: 120
-        instance_type: mac_mini_m2
+  ios_appstore:
+    name: iOS App Store
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install pods
+        script: |
+          cd ios && pod install --repo-update
+      - name: Build archive
+        script: |
+          xcodebuild -workspace ios/YourApp.xcworkspace \
+            -scheme YourScheme \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $CM_BUILD_DIR/YourApp.xcarchive \
+            clean archive
+      - name: Export IPA
+        script: |
+          xcodebuild -exportArchive \
+            -archivePath $CM_BUILD_DIR/YourApp.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath $CM_BUILD_DIR/export
+    artifacts:
+      - $CM_BUILD_DIR/export/*.ipa
+      - $CM_BUILD_DIR/export/*.dSYM.zip
+    publishing:
+      app_store_connect:
+        apple_developer_portal: habitburn_tech         # имя интеграции
+        submit_to_testflight: true               # залить в TestFlight
+        submit_to_app_store: false               # можно включить для прод-релиза
+        beta_groups: ["Internal Testers"]        # опционально
+        # app_id: 1234567890                     # numeric Apple ID, если нужно задать явно
