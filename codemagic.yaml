@@ -1,34 +1,34 @@
 workflows:
-  ios_appstore:
-    name: iOS App Store
-    max_build_duration: 60
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: HabitBurn_api_key
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.antondev.HabitBurn
+      vars:
+        BUNDLE_ID: com.antondev.HabitBurn
+        NSE_BUNDLE_ID: com.antondev.HabitBurn.OneSignalNotificationServiceExtension
+        XCODE_PROJECT: "HabitBurn.xcodeproj"
+        XCODE_SCHEME: "HabitBurn"
+        APP_STORE_APPLE_ID: 6752947441
       xcode: latest
-      cocoapods: default
     scripts:
-      - name: Install pods
+      - name: Set up provisioning profiles settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Build ipa for distribution
         script: |
-          cd ios && pod install --repo-update
-      - name: Build archive
-        script: |
-          xcodebuild -workspace ios/YourApp.xcworkspace \
-            -scheme YourScheme \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $CM_BUILD_DIR/YourApp.xcarchive \
-            clean archive
-      - name: Export IPA
-        script: |
-          xcodebuild -exportArchive \
-            -archivePath $CM_BUILD_DIR/YourApp.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath $CM_BUILD_DIR/export
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
     artifacts:
-      - $CM_BUILD_DIR/export/*.ipa
-      - $CM_BUILD_DIR/export/*.dSYM.zip
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
       app_store_connect:
-        apple_developer_portal: SX2662A87Z
-        submit_to_testflight: false
-        submit_to_app_store: true
-        beta_groups: ["Internal Testers"]
+        auth: integration
