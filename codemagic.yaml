@@ -28,8 +28,7 @@ workflows:
       - $CM_BUILD_DIR/export/*.dSYM.zip
     publishing:
       app_store_connect:
-        apple_developer_portal: SX2662A87Z         # имя интеграции
-        submit_to_testflight: false             # залить в TestFlight
-        submit_to_app_store: true               # можно включить для прод-релиза
-        beta_groups: ["Internal Testers"]        # опционально
-        # app_id: 1234567890                     # numeric Apple ID, если нужно задать явно
+        apple_developer_portal: SX2662A87Z
+        submit_to_testflight: false
+        submit_to_app_store: true
+        beta_groups: ["Internal Testers"]
