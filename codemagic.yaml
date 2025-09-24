@@ -29,7 +29,7 @@ workflows:
     publishing:
       app_store_connect:
         apple_developer_portal: habitburn_tech         # имя интеграции
-        submit_to_testflight: true               # залить в TestFlight
-        submit_to_app_store: false               # можно включить для прод-релиза
+        submit_to_testflight: false             # залить в TestFlight
+        submit_to_app_store: true               # можно включить для прод-релиза
         beta_groups: ["Internal Testers"]        # опционально
         # app_id: 1234567890                     # numeric Apple ID, если нужно задать явно
